@@ -1,0 +1,310 @@
+//
+// Created by keti on 2017. 10. 12..
+//
+
+#ifndef KCS_TEST_IPMITOOL_H
+#define KCS_TEST_IPMITOOL_H
+
+#include <stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <string.h>
+
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdlib.h>
+#include <getopt.h>
+#include <string.h>
+#include <termios.h>
+
+
+/*
+ * NetFNs
+ */
+#define IPMI_CHASSIS_NETFN      0x00
+#define IPMI_BRIDGE_NETFN       0x02
+#define IPMI_SENSOR_EVENT_NETFN     0x04
+#define IPMI_APP_NETFN          0x06
+#define IPMI_FIRMWARE_NETFN     0x08
+#define IPMI_STORAGE_NETFN      0x0a
+#define IPMI_TRANSPORT_NETFN        0x0c
+#define IPMI_GROUP_EXTENSION_NETFN  0x2c
+#define IPMI_OEM_GROUP_NETFN        0x2e
+
+
+
+// CHASSIS COMMAND
+
+#define IPMI_CHASSIS_CTL_POWER_DOWN     0x0
+#define IPMI_CHASSIS_CTL_POWER_UP       0x1
+#define IPMI_CHASSIS_CTL_POWER_CYCLE    0x2
+#define IPMI_CHASSIS_CTL_HARD_RESET     0x3
+#define IPMI_CHASSIS_CTL_PULSE_DIAG     0x4
+#define IPMI_CHASSIS_CTL_ACPI_SOFT      0x5
+
+#define IPMI_CHASSIS_POLICY_NO_CHANGE   0x3
+#define IPMI_CHASSIS_POLICY_ALWAYS_ON   0x2
+#define IPMI_CHASSIS_POLICY_PREVIOUS    0x1
+#define IPMI_CHASSIS_POLICY_ALWAYS_OFF  0x0
+
+#define IPMI_CHASSIS_POWER_STATUS       0x01
+#define IPMI_CHASSIS_POWER_CTL          0x02
+
+#define IPMI_BUF_SIZE 1024
+
+//USER COMMAND
+#define IPMI_GET_DEVICE_ID_CMD			0x01
+#define IPMI_BROADCAST_GET_DEVICE_ID_CMD	0x01
+#define IPMI_COLD_RESET_CMD			0x02
+#define IPMI_WARM_RESET_CMD			0x03
+#define IPMI_GET_SELF_TEST_RESULTS_CMD		0x04
+#define IPMI_MANUFACTURING_TEST_ON_CMD		0x05
+#define IPMI_SET_ACPI_POWER_STATE_CMD		0x06
+#define IPMI_GET_ACPI_POWER_STATE_CMD		0x07
+#define IPMI_GET_DEVICE_GUID_CMD		0x08
+#define IPMI_RESET_WATCHDOG_TIMER_CMD		0x22
+#define IPMI_SET_WATCHDOG_TIMER_CMD		0x24
+#define IPMI_GET_WATCHDOG_TIMER_CMD		0x25
+#define IPMI_SET_BMC_GLOBAL_ENABLES_CMD		0x2e
+#define IPMI_GET_BMC_GLOBAL_ENABLES_CMD		0x2f
+#define IPMI_CLEAR_MSG_FLAGS_CMD		0x30
+#define IPMI_GET_MSG_FLAGS_CMD			0x31
+#define IPMI_ENABLE_MESSAGE_CHANNEL_RCV_CMD	0x32
+#define IPMI_GET_MSG_CMD			0x33
+#define IPMI_SEND_MSG_CMD			0x34
+#define IPMI_READ_EVENT_MSG_BUFFER_CMD		0x35
+#define IPMI_GET_BT_INTERFACE_CAPABILITIES_CMD	0x36
+#define IPMI_GET_SYSTEM_GUID_CMD		0x37
+#define IPMI_GET_CHANNEL_AUTH_CAPABILITIES_CMD	0x38
+#define IPMI_GET_SESSION_CHALLENGE_CMD		0x39
+#define IPMI_ACTIVATE_SESSION_CMD		0x3a
+#define IPMI_SET_SESSION_PRIVILEGE_CMD		0x3b
+#define IPMI_CLOSE_SESSION_CMD			0x3c
+#define IPMI_GET_SESSION_INFO_CMD		0x3d
+
+#define IPMI_GET_AUTHCODE_CMD           0x3f
+#define IPMI_SET_CHANNEL_ACCESS_CMD     0x40
+#define IPMI_GET_CHANNEL_ACCESS_CMD     0x41
+#define IPMI_GET_CHANNEL_INFO_CMD       0x42
+#define IPMI_SET_USER_ACCESS_CMD        0x43
+#define IPMI_GET_USER_ACCESS_CMD        0x44
+#define IPMI_SET_USER_NAME_CMD          0x45
+#define IPMI_GET_USER_NAME_CMD          0x46
+#define IPMI_SET_USER_PASSWORD_CMD      0x47
+#define IPMI_ACTIVATE_PAYLOAD_CMD       0x48
+#define IPMI_DEACTIVATE_PAYLOAD_CMD     0x49
+#define IPMI_GET_PAYLOAD_ACTIVATION_STATUS_CMD  0x4a
+#define IPMI_GET_PAYLOAD_INSTANCE_INFO_CMD  0x4b
+#define IPMI_SET_USER_PAYLOAD_ACCESS_CMD    0x4c
+#define IPMI_GET_USER_PAYLOAD_ACCESS_CMD    0x4d
+#define IPMI_GET_CHANNEL_PAYLOAD_SUPPORT_CMD    0x4e
+#define IPMI_GET_CHANNEL_PAYLOAD_VERSION_CMD    0x4f
+#define IPMI_GET_CHANNEL_OEM_PAYLOAD_INFO_CMD   0x50
+
+#define IPMI_MASTER_READ_WRITE_CMD      0x52
+
+#define IPMI_GET_CHANNEL_CIPHER_SUITES_CMD  0x54
+#define IPMI_SUSPEND_RESUME_PAYLOAD_ENCRYPTION_CMD 0x55
+#define IPMI_SET_CHANNEL_SECURITY_KEY_CMD   0x56
+#define IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_CMD 0x57
+
+#define IPMI_SET_USER_ACCESS_CMD           0x43
+#define IPMI_GET_USER_ACCESS_CMD           0x44
+#define IPMI_SET_USER_NAME_CMD             0x45
+#define IPMI_GET_USER_NAME_CMD             0x46
+#define IPMI_SET_USER_PASSWORD_CMD         0x47
+#define SEND_MAX_PAYLOAD_SIZE       34  /* MAX payload */
+#define RECV_MAX_PAYLOAD_SIZE       33  /* MAX payload */
+
+#define MAX_USERNAME    17
+#define MAX_PASSWD      40
+#define MAX_COMMENT     100
+#define MAX_ID          10
+#define BUFSIZE         256
+#define GET_NAME        0
+#define GET_PASSWD      1
+#define GET_ID          2
+#define GET_ACCESS     3
+#define MAX_USER        10
+#define MAX_PASSWD      40
+
+// LAN
+#define IPMI_LAN_SET_CONFIG_CMD 0x01
+#define IPMI_LAN_GET_CONFIG_CMD 0x02
+#define IPMI_LAN_SUSPEND_ARP_CMD    0x03
+# define IPMI_LAN_SUSPEND_ARP_RESP (2)
+# define IPMI_LAN_SUSPEND_ARP_GRAT (1)
+#define IPMI_LAN_GET_STAT_CMD   0x04
+
+
+/* DCMI commands per DCMI 1.5 SPEC */
+#define IPMI_DCMI                   0xDC  /* Group Extension Identification */
+#define IPMI_DCMI_COMPAT            0x01
+#define IPMI_DCMI_GETRED            0x02
+#define IPMI_DCMI_GETLMT            0x03
+#define IPMI_DCMI_SETLMT            0x04
+#define IPMI_DCMI_PWRACT            0x05
+#define IPMI_DCMI_GETASSET          0x06
+#define IPMI_DCMI_SETASSET          0x08
+#define IPMI_DCMI_GETMNGCTRLIDS     0x09
+#define IPMI_DCMI_SETMNGCTRLIDS     0x0A
+#define IPMI_DCMI_SETTERMALLIMIT    0x0B
+#define IPMI_DCMI_GETTERMALLIMIT    0x0C
+#define IPMI_DCMI_GETSNSR           0x07
+#define IPMI_DCMI_PWRMGT            0x08
+#define IPMI_DCMI_GETTEMPRED        0x10
+#define IPMI_DCMI_SETCONFPARAM      0x12
+#define IPMI_DCMI_GETCONFPARAM      0x13
+
+/* External Node Manager Configuration and Control Commands per spec 2.0 */
+#define IPMI_NM_POLICY_CTL     0xC0
+#define IPMI_NM_SET_POLICY     0xC1
+#define IPMI_NM_GET_POLICY     0xC2
+#define IPMI_NM_SET_ALERT_TH   0xC3
+#define IPMI_NM_GET_ALERT_TH   0xC4
+#define IPMI_NM_SET_SUSPEND    0xC5
+#define IPMI_NM_GET_SUSPEND    0xC6
+#define IPMI_NM_RESET_STATS    0xC7
+#define IPMI_NM_GET_STATS      0xC8
+#define IPMI_NM_GET_CAP        0xC9
+#define IPMI_NM_GET_VERSION    0xCA
+#define IPMI_NM_SET_POWER      0xCB
+#define IPMI_NM_SET_ALERT_DS   0xCE
+#define IPMI_NM_GET_ALERT_DS   0xCF
+#define IPMI_NM_LIMITING       0xF2
+
+/* Node Manager Policy Control Flags */
+#define IPMI_NM_GLOBAL_ENABLE  0x01
+#define IPMI_NM_DOMAIN_ENABLE  0x02
+#define IPMI_NM_PER_POLICY_ENABLE  0x04
+
+/* Node Manager Set Policy Enable */
+#define IPMI_NM_POLICY_ENABLE  0x10
+
+#define IPMI_SET_USER_PAYLOAD_ACCESS        0x4c
+#define IPMI_GET_USER_PAYLOAD_ACCESS        0x4d
+
+#define IPMI_SET_SOL_CONFIG_PARAMETERS          0x21
+#define IPMI_GET_SOL_CONFIG_PARAMETERS          0x22
+
+#define IPMI_ACTIVATE_PAYLOAD                   0x48
+#define IPMI_DEACTIVATE_PAYLOAD                 0x49
+
+#define IPMI_DCMI_GETLMT            0x03
+#define IPMI_DCMI_SETLMT            0x04
+
+// SDR
+#define BMC_GET_DEVICE_ID   0x01
+#define BMC_COLD_RESET      0x02
+#define BMC_WARM_RESET      0x03
+#define BMC_GET_SELF_TEST   0x04
+#define BMC_RESET_WATCHDOG_TIMER    0x22
+#define BMC_SET_WATCHDOG_TIMER  0x24
+#define BMC_GET_WATCHDOG_TIMER  0x25
+#define BMC_SET_GLOBAL_ENABLES  0x2e
+#define BMC_GET_GLOBAL_ENABLES  0x2f
+#define BMC_GET_GUID        0x37
+
+#define GET_DEVICE_SDR_INFO      0x20
+#define GET_DEVICE_SDR           0x21
+#define GET_SENSOR_FACTORS      0x23
+#define GET_SENSOR_FACTORS      0x23
+#define SET_SENSOR_HYSTERESIS   0x24
+#define GET_SENSOR_HYSTERESIS   0x25
+#define SET_SENSOR_THRESHOLDS   0x26
+#define GET_SENSOR_THRESHOLDS   0x27
+#define SET_SENSOR_EVENT_ENABLE 0x28
+#define GET_SENSOR_EVENT_ENABLE 0x29
+#define GET_SENSOR_EVENT_STATUS 0x2b
+#define GET_SENSOR_READING  0x2d
+#define GET_SENSOR_TYPE     0x2f
+#define GET_SDR_REPO_INFO   0x20
+#define GET_SDR_ALLOC_INFO  0x21
+#define GET_SDR_RESERVE_REPO    0x22
+#define GET_SDR     0x23
+#define GET_SDR_ENTIRE_RECORD   0xff
+#define ADD_PARTIAL_SDR 0x25
+
+#define IPMI_GET_SDR_REPOSITORY_INFO            0x20
+#define IPMI_SOL_ACTIVATING                     0x20
+#define IPMI_SET_SOL_CONFIG_PARAMETERS          0x21
+#define IPMI_GET_SOL_CONFIG_PARAMETERS          0x22
+#define IPMI_SET_USER_ACCESS                    0x43
+#define IPMI_GET_USER_ACCESS                    0x44
+#define IPMI_SET_USER_NAME                      0x45
+#define IPMI_GET_USER_NAME                      0x46
+#define IPMI_SET_USER_PASSWORD                  0x47
+#define IPMI_ACTIVATE_PAYLOAD                   0x48
+#define IPMI_DEACTIVATE_PAYLOAD                 0x49
+#define IPMI_SUSPEND_RESUME_PAYLOAD_ENCRYPTYION 0x55
+#define IPMI_GET_SEL_TIME                       0x48
+#define IPMI_SET_SEL_TIME                       0x49
+#define IPMI_SET_USER_PAYLOAD_ACCESS        0x4c
+#define IPMI_GET_USER_PAYLOAD_ACCESS        0x4d
+
+// SEL
+#define IPMI_CMD_GET_SEL_INFO       0x40
+#define IPMI_CMD_GET_SEL_ALLOC_INFO 0x41
+#define IPMI_CMD_RESERVE_SEL        0x42
+#define IPMI_CMD_GET_SEL_ENTRY      0x43
+#define IPMI_CMD_ADD_SEL_ENTRY      0x44
+#define IPMI_CMD_PARTIAL_ADD_SEL_ENTRY  0x45
+#define IPMI_CMD_DELETE_SEL_ENTRY   0x46
+#define IPMI_CMD_CLEAR_SEL      0x47
+#define IPMI_CMD_GET_SEL_TIME       0x48
+#define IPMI_CMD_SET_SEL_TIME       0x49
+#define IPMI_CMD_GET_AUX_LOG_STATUS 0x5A
+#define IPMI_CMD_SET_AUX_LOG_STATUS 0x5B
+
+// FRU
+#define GET_FRU_INFO       0x10
+#define GET_FRU_DATA        0x11
+#define SET_FRU_DATA        0x12
+
+
+enum {
+	IPMI_LANP_SET_IN_PROGRESS,
+	IPMI_LANP_AUTH_TYPE,
+	IPMI_LANP_AUTH_TYPE_ENABLE,
+	IPMI_LANP_IP_ADDR,
+	IPMI_LANP_IP_ADDR_SRC,
+	IPMI_LANP_MAC_ADDR,            /* 5 */
+	IPMI_LANP_SUBNET_MASK,
+	IPMI_LANP_IP_HEADER,
+	IPMI_LANP_PRI_RMCP_PORT,
+	IPMI_LANP_SEC_RMCP_PORT,
+	IPMI_LANP_BMC_ARP,             /* 10 */
+	IPMI_LANP_GRAT_ARP,
+	IPMI_LANP_DEF_GATEWAY_IP,
+	IPMI_LANP_DEF_GATEWAY_MAC,
+	IPMI_LANP_BAK_GATEWAY_IP,
+	IPMI_LANP_BAK_GATEWAY_MAC,     /* 15 */
+	IPMI_LANP_SNMP_STRING,
+	IPMI_LANP_NUM_DEST,
+	IPMI_LANP_DEST_TYPE,
+	IPMI_LANP_DEST_ADDR,
+	IPMI_LANP_VLAN_ID,             /* 20 */
+	IPMI_LANP_VLAN_PRIORITY,
+	IPMI_LANP_RMCP_CIPHER_SUPPORT,
+	IPMI_LANP_RMCP_CIPHERS,
+	IPMI_LANP_RMCP_PRIV_LEVELS,
+	IPMI_LANP_VLAN_TAGS,
+	IPMI_LANP_BAD_PASS_THRESH,
+	IPMI_LANP_OEM_ALERT_STRING=96,
+	IPMI_LANP_ALERT_RETRY=97,
+	IPMI_LANP_UTC_OFFSET=98,
+	IPMI_LANP_DHCP_SERVER_IP=192,
+	IPMI_LANP_DHCP_SERVER_MAC=193,
+	IPMI_LANP_DHCP_ENABLE=194,
+	IPMI_LANP_CHAN_ACCESS_MODE=201,
+};
+
+#define DEMO 1
+#endif //KCS_TEST_IPMITOOL_H
